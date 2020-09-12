@@ -12,7 +12,7 @@
               [ngClass]="{'active': product?.id === selectedProduct?.id}"
               (click)="productSelected(product)">{{ product.productName }}
         <ng-container *ngIf="displayCode">
-          ({{ product.productCode }})
+          ({{ product.productCode }}) <!-- the dispatched action from the click event is subscribed to from the components class and set to the products-->
         </ng-container>
       </button>
     </div>
