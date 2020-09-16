@@ -5,6 +5,7 @@ import { Subscription } from 'rxjs';
 
 import { Product } from '../product';
 import { ProductService } from '../product.service';
+import {  State } from '../state/product.reducer';
 
 @Component({
   selector: 'pm-product-list',
@@ -23,7 +24,7 @@ export class ProductListComponent implements OnInit, OnDestroy {
   selectedProduct: Product | null;
   sub: Subscription;
 
-  constructor(private store:Store<any>, private productService: ProductService) { }
+  constructor(private store:Store<State>, private productService: ProductService) { }
 
   ngOnInit(): void {
     this.sub = this.productService.selectedProductChanges$.subscribe(
@@ -35,7 +36,7 @@ export class ProductListComponent implements OnInit, OnDestroy {
       error: err => this.errorMessage = err
     });
 
-    this.store.select('products').subscribe( // this is the slice of the state of the reducer
+    this.store.select('products').subscribe( // this is the slice of the state of the reducer, the reducer is loaded in the module will load the state specified here
       products => {
         if (products){
           this.displayCode = products.showProductCode;
@@ -50,6 +51,7 @@ export class ProductListComponent implements OnInit, OnDestroy {
   checkChanged(): void {
     //this.displayCode = !this.displayCode;
     console.log('Check changed function called');
+    // the reducer responds to the dispatched action, so when you subscribe call with the reducer name "products" here
     this.store.dispatch(
       {type: '[Product] Toggle Product Code'}
     );

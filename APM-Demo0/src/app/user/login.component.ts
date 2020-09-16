@@ -1,8 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { Router } from '@angular/router';
+import { Store } from '@ngrx/store';
 
 import { AuthService } from './auth.service';
+import { State } from './state/user.reducer';
 
 @Component({
   templateUrl: './login.component.html',
@@ -13,10 +15,18 @@ export class LoginComponent implements OnInit {
 
   maskUserName: boolean;
 
-  constructor(private authService: AuthService, private router: Router) { }
+  constructor(private store: Store<State>,private authService: AuthService, private router: Router) { }
 
   ngOnInit(): void {
 
+    this.store.select('user').subscribe( // the reference is the state and not the reducer, the reducer is loaded in the module will load the state specified here
+      users => {
+        if (users) {
+          this.maskUserName = users.maskUserName;
+        }
+      }, err =>{
+        console.error();
+      });
   }
 
   cancel(): void {
@@ -24,7 +34,10 @@ export class LoginComponent implements OnInit {
   }
 
   checkChanged(): void {
-    this.maskUserName = !this.maskUserName;
+    //this.maskUserName = !this.maskUserName;
+    this.store.dispatch( // we dispatch the action here which is subscribed on the init method so the changes are listened/watched and loaded by the component
+      { type: '[User] Mask User Name' }
+    );
   }
 
   login(loginForm: NgForm): void {
