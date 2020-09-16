@@ -2,9 +2,10 @@ import { Component, OnInit } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
+import { State } from '../state/app.state';
 
 import { AuthService } from './auth.service';
-import { State } from './state/user.reducer';
+
 
 @Component({
   templateUrl: './login.component.html',
