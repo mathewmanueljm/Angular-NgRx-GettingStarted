@@ -1,18 +1,19 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Store } from '@ngrx/store';
 
 import { Subscription } from 'rxjs';
 
 import { Product } from '../product';
 import { ProductService } from '../product.service';
-import {  State } from '../state/product.reducer';
+import {  getCurrentProduct, getShowProductCode, State } from '../state/product.reducer';
+import * as ProductAction from '../state/product.action';
 
 @Component({
   selector: 'pm-product-list',
   templateUrl: './product-list.component.html',
   styleUrls: ['./product-list.component.css']
 })
-export class ProductListComponent implements OnInit, OnDestroy {
+export class ProductListComponent implements OnInit {
   pageTitle = 'Products';
   errorMessage: string;
 
@@ -27,7 +28,7 @@ export class ProductListComponent implements OnInit, OnDestroy {
   constructor(private store:Store<State>, private productService: ProductService) { }
 
   ngOnInit(): void {
-    this.sub = this.productService.selectedProductChanges$.subscribe(
+    this.store.select(getCurrentProduct).subscribe(
       currentProduct => this.selectedProduct = currentProduct
     );
 
@@ -36,33 +37,32 @@ export class ProductListComponent implements OnInit, OnDestroy {
       error: err => this.errorMessage = err
     });
 
-    this.store.select('products').subscribe( // this is the slice of the state of the reducer, the reducer is loaded in the module will load the state specified here
-      products => {
-        if (products){
-          this.displayCode = products.showProductCode;
-        } 
-      });
+    //this.store.select('products').subscribe( // this is the slice of the state of the reducer, the reducer is loaded in the module will load the state specified here
+      this.store.select(getShowProductCode).subscribe( 
+      showProductCode =>  this.displayCode = showProductCode
+     );
+
   }
 
-  ngOnDestroy(): void {
-    this.sub.unsubscribe();
-  }
 
   checkChanged(): void {
     //this.displayCode = !this.displayCode;
     console.log('Check changed function called');
     // the reducer responds to the dispatched action, so when you subscribe call with the reducer name "products" here
     this.store.dispatch(
-      {type: '[Product] Toggle Product Code'}
+    //  {type: '[Product] Toggle Product Code'}
+    ProductAction.toggleProductCode()
     );
   }
 
   newProduct(): void {
-    this.productService.changeSelectedProduct(this.productService.newProduct());
+    //this.productService.changeSelectedProduct(this.productService.newProduct());
+    this.store.dispatch(ProductAction.initializeCurrentProduct());
   }
 
   productSelected(product: Product): void {
-    this.productService.changeSelectedProduct(product);
+    //this.productService.changeSelectedProduct(product);
+    this.store.dispatch(ProductAction.setCurrentProduct({product}));
   }
 
 }
